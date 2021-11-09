@@ -4,23 +4,19 @@ package mutex;
 option go_package = "./mutex";
 
 service mutexService{
-    rpc enter(RequestCriticalSection) returns (stream Response);
-    rpc exit(emptyResponse) returns(emptyResponse); 
+    rpc Enter(RequestCriticalSection) returns (Response);
 }
 
 message Response{
     int32 id = 1;
-    repeated int32 vectorClock = 2;
+    int32 timestamp = 2;
 }
 
 message RequestCriticalSection{
     int32 id = 1;
-    repeated int32 vectorClock = 2;
+    int32 timestamp = 2;
 }
 
-message emptyResponse{
-
-}
 
 
 

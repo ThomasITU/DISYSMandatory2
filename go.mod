@@ -1,4 +1,4 @@
-module github.com/ThomasITU/DISYSMandatory2.git
+module github.com/ThomasITU/DISYSMandatory2
 
 go 1.17
 
