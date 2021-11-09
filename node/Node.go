@@ -18,8 +18,9 @@ const (
 	logFileName = "serverLog"
 )
 
-type server struct {
+type Server struct {
 	mutex.UnimplementedMutexServiceServer
+	this node
 }
 
 type node struct {
@@ -51,23 +52,30 @@ func main() {
 }
 
 func PassToken(ctx context.Context, node *node) {
-	conn, err := grpc.Dial("localhost:"+strconv.Itoa(node.nextNodePort), grpc.WithInsecure())
+	//address       = "localhost:8080"
+	address := fmt.Sprintf("localhost:%v", node.nextNodePort)
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to connect to: %s", strconv.Itoa(node.port))
 	}
 	nextNode := mutex.NewMutexServiceClient(conn)
 
 	if _, err := nextNode.Token(ctx, &mutex.EmptyRequest{}); err != nil {
+		log.Println(err)
+	} else {
+		log.Println("No errors")
 	}
 }
 
-func (s *server) Token(ctx context.Context, node *node) (*mutex.EmptyResponse, error) {
-	if node.state {
-		writeToLog(node.id, logFileName)
-		node.state = false
+func (s *Server) Token(ctx context.Context, empty *mutex.EmptyRequest) (*mutex.EmptyResponse, error) {
+	if s.this.state {
+		writeToLog(s.this.id, logFileName)
+		s.this.state = false
 	}
+	log.Printf("I'm node id: %v", s.this.id)
+	//fmt.Printf()
 	time.Sleep(1 * time.Second)
-	PassToken(ctx, node)
+	PassToken(ctx, &s.this)
 	return &mutex.EmptyResponse{}, nil
 }
 
@@ -89,7 +97,7 @@ func listen(port int) {
 	}
 
 	grpcServer := grpc.NewServer()
-	mutex.RegisterMutexServiceServer(grpcServer, mutex.UnimplementedMutexServiceServer{})
+	mutex.RegisterMutexServiceServer(grpcServer, &Server{})
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve on ")
 	}
