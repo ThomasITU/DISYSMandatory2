@@ -5,6 +5,7 @@ option go_package = "./mutex";
 
 service mutexService{
     rpc Enter(RequestCriticalSection) returns (Response);
+    rpc Exit(Response) returns(EmptyResponse);
 }
 
 message Response{
@@ -15,6 +16,10 @@ message Response{
 message RequestCriticalSection{
     int32 id = 1;
     int32 timestamp = 2;
+}
+
+message EmptyResponse{
+
 }
 
 

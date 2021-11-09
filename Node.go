@@ -7,16 +7,20 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/ThomasITU/DISYSMandatory2/mutex"
 	gRPC "google.golang.org/grpc"
-	"google.golang.org/grpc/balancer/grpclb/state"
 )
 
 // lav en node struct med info og de andre
 const (
 	logFileName = "serverLog"
+)
+
+const (
+	RELEASED int = 0
+	WANTED       = 1
+	HELD         = 2
 )
 
 type server struct {
@@ -25,7 +29,7 @@ type server struct {
 
 type node struct {
 	id           int
-	state 		 int
+	state        int
 	ports        []int
 	port         int
 	timeStamp    int
@@ -42,11 +46,9 @@ func main() {
 
 	go listen(node.port)
 
-
 	request := mutex.RequestCriticalSection{Id: int32(node.id)}
 	ctx := context.Background()
 
-	
 	// broadcast til de andre noder grpc.dial
 	// grpc.send conn.send
 
@@ -75,23 +77,31 @@ func getAllPorts() []int {
 	return s
 }
 
-func requestAccess(ctx context.Context, request *mutex.RequestCriticalSection, node *node){
-	for otherNode := range node.ports{
-		
+func requestAccess(ctx context.Context, request *mutex.RequestCriticalSection, node *node) {
+	for otherNode := range node.ports {
+
 		conn, err := gRPC.Dial("localhost:"+strconv.Itoa(otherNode), gRPC.WithInsecure())
 		if err != nil {
-	
+
 		}
 		c := mutex.NewMutexServiceClient(conn)
-		
-		
+
 		c.Enter(ctx, request)
 	}
 }
 
-func (s *server) Enter(ctx context.Context, request *mutex.RequestCriticalSection, node *node) (*mutex.Response, error) {
-	id := request.Id
-	timeStamp := request.GetVectorClock()
+func (s *server) Enter(ctx context.Context, otherNodeRequest *mutex.RequestCriticalSection, node *node) (*mutex.Response, error) {
+	id := otherNodeRequest.GetId()
+	timeStamp := otherNodeRequest.GetTimestamp()
+
+	if node.state == 2 || node.state == 1 && node.timeStamp < int(timeStamp) {
+		req := request{id: int(id), timestamp: int(timeStamp)}
+		node.requestQueue <- req
+	}else{
+		response := mutex.Response{node.id, }
+		return 
+	}
+
 }
 
 func writeToLog(nodeID int, timestamp int, logName string) {
