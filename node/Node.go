@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/ThomasITU/DISYSMandatory2/mutex"
-	gRPC "google.golang.org/grpc"
+	"google.golang.org/grpc"
 )
 
 // lav en node struct med info og de andre
@@ -25,57 +25,53 @@ type server struct {
 type node struct {
 	id           int
 	state        bool
-	nextNodePort     int
+	nextNodePort int
 	port         int
 }
 
-
-func main() {
+func start(id int, port int, nextPort int,hasToken bool) {
 	//get input id, ownport, next port
-	node := node{id: 0, state: false, nextNodePort: 8090, port: 8080}
+	node := node{id: id, state: hasToken, nextNodePort: nextPort, port: port}
 
 	go listen(node.port)
 
 	ctx := context.Background()
-	conn, err := gRPC.Dial("localhost:"+strconv.Itoa(node.nextNodePort), gRPC.WithInsecure())
-	if err != nil {
-		log.Fatalf("failed to connect to: %s", strconv.Itoa(node.port))
-	}
-	c := mutex.NewMutexServiceClient(conn)
 
-
-	if(node.id == 0 && node.state == true) {
-		writeToLog(node.id,logFileName)
-		c.Enter(ctx,node,conn)
+	if node.state == true {
+		writeToLog(node.id, logFileName)
+		PassToken(ctx, &node)
 	}
 
+	fmt.Scanln()
 
-	
+	for {
+
+	}
+
 	// broadcast til de andre noder grpc.dial
 	// grpc.send conn.send
 
 }
 
-func clientEnter(){
-	conn, err := gRPC.Dial("localhost:"+strconv.Itoa(node.nextNodePort), gRPC.WithInsecure())
+func PassToken(ctx context.Context,node *node) {
+	conn, err := grpc.Dial("localhost:"+strconv.Itoa(node.nextNodePort), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to connect to: %s", strconv.Itoa(node.port))
 	}
-	c := mutex.NewMutexServiceClient(conn)
+	nextNode := mutex.NewMutexServiceClient(conn)
 
-	response := c.Enter(&mutex.{})
+	if _,err  := nextNode.Token(ctx, &mutex.EmptyRequest{}); err != nil {}
 }
 
-func (s *server) Enter(ctx context.Context, node *node) (*mutex.Response, error) {
-	if (node.state){
+func (s *server) Token(ctx context.Context, node *node) (*mutex.EmptyResponse, error) {
+	if node.state {
 		writeToLog(node.id, logFileName)
+		node.state = false
 	}
 	time.Sleep(1 * time.Second)
-	clientEnter()
-
+	PassToken(ctx, node)
+	return &mutex.EmptyResponse{}, nil
 }
-
-func (s *server) Exit(ctx context.Context)
 
 func writeToLog(nodeID int, logName string) {
 	f, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -85,7 +81,7 @@ func writeToLog(nodeID int, logName string) {
 	defer f.Close()
 
 	log.SetOutput(f)
-	log.Printf("Node nr. %s has entered the critical section at time: %v", nodeID, timestamp)
+	log.Printf("Node nr. %s has entered the critical section at time: %v", nodeID)
 }
 
 func listen(port int) {
@@ -94,8 +90,8 @@ func listen(port int) {
 		log.Fatalf("Could not listen to %s", port)
 	}
 
-	grpcServer := gRPC.NewServer()
-	mutex.RegisterMutexServiceServer(grpcServer, &server{})
+	grpcServer := grpc.NewServer()
+	mutex.RegisterMutexServiceServer(grpcServer, &erver{})
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve on ")
 	}
