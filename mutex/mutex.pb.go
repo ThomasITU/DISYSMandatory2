@@ -25,17 +25,14 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type Response struct {
+type EmptyRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
-	Id        int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Timestamp int32 `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 }
 
-func (x *Response) Reset() {
-	*x = Response{}
+func (x *EmptyRequest) Reset() {
+	*x = EmptyRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_mutex_mutex_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -43,13 +40,13 @@ func (x *Response) Reset() {
 	}
 }
 
-func (x *Response) String() string {
+func (x *EmptyRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Response) ProtoMessage() {}
+func (*EmptyRequest) ProtoMessage() {}
 
-func (x *Response) ProtoReflect() protoreflect.Message {
+func (x *EmptyRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_mutex_mutex_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -61,78 +58,9 @@ func (x *Response) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Response.ProtoReflect.Descriptor instead.
-func (*Response) Descriptor() ([]byte, []int) {
+// Deprecated: Use EmptyRequest.ProtoReflect.Descriptor instead.
+func (*EmptyRequest) Descriptor() ([]byte, []int) {
 	return file_mutex_mutex_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *Response) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *Response) GetTimestamp() int32 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
-}
-
-type RequestCriticalSection struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id        int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Timestamp int32 `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-}
-
-func (x *RequestCriticalSection) Reset() {
-	*x = RequestCriticalSection{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_mutex_mutex_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *RequestCriticalSection) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RequestCriticalSection) ProtoMessage() {}
-
-func (x *RequestCriticalSection) ProtoReflect() protoreflect.Message {
-	mi := &file_mutex_mutex_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RequestCriticalSection.ProtoReflect.Descriptor instead.
-func (*RequestCriticalSection) Descriptor() ([]byte, []int) {
-	return file_mutex_mutex_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *RequestCriticalSection) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *RequestCriticalSection) GetTimestamp() int32 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
 }
 
 type EmptyResponse struct {
@@ -144,7 +72,7 @@ type EmptyResponse struct {
 func (x *EmptyResponse) Reset() {
 	*x = EmptyResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_mutex_mutex_proto_msgTypes[2]
+		mi := &file_mutex_mutex_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -157,7 +85,7 @@ func (x *EmptyResponse) String() string {
 func (*EmptyResponse) ProtoMessage() {}
 
 func (x *EmptyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mutex_mutex_proto_msgTypes[2]
+	mi := &file_mutex_mutex_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -170,32 +98,22 @@ func (x *EmptyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmptyResponse.ProtoReflect.Descriptor instead.
 func (*EmptyResponse) Descriptor() ([]byte, []int) {
-	return file_mutex_mutex_proto_rawDescGZIP(), []int{2}
+	return file_mutex_mutex_proto_rawDescGZIP(), []int{1}
 }
 
 var File_mutex_mutex_proto protoreflect.FileDescriptor
 
 var file_mutex_mutex_proto_rawDesc = []byte{
 	0x0a, 0x11, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x2f, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x12, 0x05, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x22, 0x38, 0x0a, 0x08, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74,
-	0x61, 0x6d, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73,
-	0x74, 0x61, 0x6d, 0x70, 0x22, 0x46, 0x0a, 0x16, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x43,
-	0x72, 0x69, 0x74, 0x69, 0x63, 0x61, 0x6c, 0x53, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0e,
-	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1c,
-	0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x05, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x0f, 0x0a, 0x0d,
-	0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x76, 0x0a,
-	0x0c, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x37, 0x0a,
-	0x05, 0x45, 0x6e, 0x74, 0x65, 0x72, 0x12, 0x1d, 0x2e, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x2e, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x43, 0x72, 0x69, 0x74, 0x69, 0x63, 0x61, 0x6c, 0x53, 0x65,
-	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x1a, 0x0f, 0x2e, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x2e, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x04, 0x45, 0x78, 0x69, 0x74, 0x12, 0x0f,
-	0x2e, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a,
-	0x14, 0x2e, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x09, 0x5a, 0x07, 0x2e, 0x2f, 0x6d, 0x75, 0x74, 0x65, 0x78,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x74, 0x6f, 0x12, 0x05, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x22, 0x0e, 0x0a, 0x0c, 0x45, 0x6d,
+	0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x0f, 0x0a, 0x0d, 0x45, 0x6d,
+	0x70, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x42, 0x0a, 0x0c, 0x6d,
+	0x75, 0x74, 0x65, 0x78, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x32, 0x0a, 0x05, 0x54,
+	0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x13, 0x2e, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x2e, 0x45, 0x6d, 0x70,
+	0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e, 0x6d, 0x75, 0x74, 0x65,
+	0x78, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42,
+	0x09, 0x5a, 0x07, 0x2e, 0x2f, 0x6d, 0x75, 0x74, 0x65, 0x78, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -210,19 +128,16 @@ func file_mutex_mutex_proto_rawDescGZIP() []byte {
 	return file_mutex_mutex_proto_rawDescData
 }
 
-var file_mutex_mutex_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_mutex_mutex_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_mutex_mutex_proto_goTypes = []interface{}{
-	(*Response)(nil),               // 0: mutex.Response
-	(*RequestCriticalSection)(nil), // 1: mutex.RequestCriticalSection
-	(*EmptyResponse)(nil),          // 2: mutex.EmptyResponse
+	(*EmptyRequest)(nil),  // 0: mutex.EmptyRequest
+	(*EmptyResponse)(nil), // 1: mutex.EmptyResponse
 }
 var file_mutex_mutex_proto_depIdxs = []int32{
-	1, // 0: mutex.mutexService.Enter:input_type -> mutex.RequestCriticalSection
-	0, // 1: mutex.mutexService.Exit:input_type -> mutex.Response
-	0, // 2: mutex.mutexService.Enter:output_type -> mutex.Response
-	2, // 3: mutex.mutexService.Exit:output_type -> mutex.EmptyResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	0, // 0: mutex.mutexService.Token:input_type -> mutex.EmptyRequest
+	1, // 1: mutex.mutexService.Token:output_type -> mutex.EmptyResponse
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -235,7 +150,7 @@ func file_mutex_mutex_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_mutex_mutex_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Response); i {
+			switch v := v.(*EmptyRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -247,18 +162,6 @@ func file_mutex_mutex_proto_init() {
 			}
 		}
 		file_mutex_mutex_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RequestCriticalSection); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_mutex_mutex_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*EmptyResponse); i {
 			case 0:
 				return &v.state
@@ -277,7 +180,7 @@ func file_mutex_mutex_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_mutex_mutex_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

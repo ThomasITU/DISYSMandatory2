@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/ThomasITU/DISYSMandatory2/mutex"
 	gRPC "google.golang.org/grpc"
@@ -17,94 +18,66 @@ const (
 	logFileName = "serverLog"
 )
 
-const (
-	RELEASED int = 0
-	WANTED       = 1
-	HELD         = 2
-)
-
 type server struct {
 	mutex.UnimplementedMutexServiceServer
 }
 
 type node struct {
 	id           int
-	state        int
-	ports        []int
+	state        bool
+	nextNodePort     int
 	port         int
-	timeStamp    int
-	requestQueue chan request
 }
 
-type request struct {
-	id        int
-	timestamp int
-}
 
 func main() {
-	node := node{id: 0, ports: getAllPorts(), port: getAllPorts()[0], timeStamp: 0}
+	//get input id, ownport, next port
+	node := node{id: 0, state: false, nextNodePort: 8090, port: 8080}
 
 	go listen(node.port)
 
-	request := mutex.RequestCriticalSection{Id: int32(node.id)}
 	ctx := context.Background()
+	conn, err := gRPC.Dial("localhost:"+strconv.Itoa(node.nextNodePort), gRPC.WithInsecure())
+	if err != nil {
+		log.Fatalf("failed to connect to: %s", strconv.Itoa(node.port))
+	}
+	c := mutex.NewMutexServiceClient(conn)
 
+
+	if(node.id == 0 && node.state == true) {
+		writeToLog(node.id,logFileName)
+		c.Enter(ctx,node,conn)
+	}
+
+
+	
 	// broadcast til de andre noder grpc.dial
 	// grpc.send conn.send
 
 }
 
-func getAllPorts() []int {
-	s := make([]int, 5)
-
-	file, err := os.Open("ports.txt")
+func clientEnter(){
+	conn, err := gRPC.Dial("localhost:"+strconv.Itoa(node.nextNodePort), gRPC.WithInsecure())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to connect to: %s", strconv.Itoa(node.port))
 	}
-	defer file.Close()
+	c := mutex.NewMutexServiceClient(conn)
 
-	scanner := bufio.NewScanner(file)
-
-	i := 0
-	for scanner.Scan() {
-		s[i], err = strconv.Atoi(scanner.Text())
-		i++
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-	return s
+	response := c.Enter(&mutex.{})
 }
 
-func requestAccess(ctx context.Context, request *mutex.RequestCriticalSection, node *node) {
-	for otherNode := range node.ports {
-
-		conn, err := gRPC.Dial("localhost:"+strconv.Itoa(otherNode), gRPC.WithInsecure())
-		if err != nil {
-
-		}
-		c := mutex.NewMutexServiceClient(conn)
-
-		c.Enter(ctx, request)
+func (s *server) Enter(ctx context.Context, node *node) (*mutex.Response, error) {
+	if (node.state){
+		writeToLog(node.id, logFileName)
 	}
-}
-
-func (s *server) Enter(ctx context.Context, otherNodeRequest *mutex.RequestCriticalSection, node *node) (*mutex.Response, error) {
-	id := otherNodeRequest.GetId()
-	timeStamp := otherNodeRequest.GetTimestamp()
-
-	if node.state == 2 || node.state == 1 && node.timeStamp < int(timeStamp) {
-		req := request{id: int(id), timestamp: int(timeStamp)}
-		node.requestQueue <- req
-	}else{
-		response := mutex.Response{node.id, }
-		return 
-	}
+	time.Sleep(1 * time.Second)
+	clientEnter()
 
 }
 
-func writeToLog(nodeID int, timestamp int, logName string) {
+func (s *server) Exit(ctx context.Context)
+
+func writeToLog(nodeID int, logName string) {
 	f, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)

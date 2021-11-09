@@ -18,8 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MutexServiceClient interface {
-	Enter(ctx context.Context, in *RequestCriticalSection, opts ...grpc.CallOption) (*Response, error)
-	Exit(ctx context.Context, in *Response, opts ...grpc.CallOption) (*EmptyResponse, error)
+	Token(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error)
 }
 
 type mutexServiceClient struct {
@@ -30,18 +29,9 @@ func NewMutexServiceClient(cc grpc.ClientConnInterface) MutexServiceClient {
 	return &mutexServiceClient{cc}
 }
 
-func (c *mutexServiceClient) Enter(ctx context.Context, in *RequestCriticalSection, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
-	err := c.cc.Invoke(ctx, "/mutex.mutexService/Enter", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mutexServiceClient) Exit(ctx context.Context, in *Response, opts ...grpc.CallOption) (*EmptyResponse, error) {
+func (c *mutexServiceClient) Token(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyResponse, error) {
 	out := new(EmptyResponse)
-	err := c.cc.Invoke(ctx, "/mutex.mutexService/Exit", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mutex.mutexService/Token", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +42,7 @@ func (c *mutexServiceClient) Exit(ctx context.Context, in *Response, opts ...grp
 // All implementations must embed UnimplementedMutexServiceServer
 // for forward compatibility
 type MutexServiceServer interface {
-	Enter(context.Context, *RequestCriticalSection) (*Response, error)
-	Exit(context.Context, *Response) (*EmptyResponse, error)
+	Token(context.Context, *EmptyRequest) (*EmptyResponse, error)
 	mustEmbedUnimplementedMutexServiceServer()
 }
 
@@ -61,11 +50,8 @@ type MutexServiceServer interface {
 type UnimplementedMutexServiceServer struct {
 }
 
-func (UnimplementedMutexServiceServer) Enter(context.Context, *RequestCriticalSection) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Enter not implemented")
-}
-func (UnimplementedMutexServiceServer) Exit(context.Context, *Response) (*EmptyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Exit not implemented")
+func (UnimplementedMutexServiceServer) Token(context.Context, *EmptyRequest) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Token not implemented")
 }
 func (UnimplementedMutexServiceServer) mustEmbedUnimplementedMutexServiceServer() {}
 
@@ -80,38 +66,20 @@ func RegisterMutexServiceServer(s grpc.ServiceRegistrar, srv MutexServiceServer)
 	s.RegisterService(&MutexService_ServiceDesc, srv)
 }
 
-func _MutexService_Enter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RequestCriticalSection)
+func _MutexService_Token_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MutexServiceServer).Enter(ctx, in)
+		return srv.(MutexServiceServer).Token(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mutex.mutexService/Enter",
+		FullMethod: "/mutex.mutexService/Token",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MutexServiceServer).Enter(ctx, req.(*RequestCriticalSection))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MutexService_Exit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Response)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MutexServiceServer).Exit(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/mutex.mutexService/Exit",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MutexServiceServer).Exit(ctx, req.(*Response))
+		return srv.(MutexServiceServer).Token(ctx, req.(*EmptyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,12 +92,8 @@ var MutexService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MutexServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Enter",
-			Handler:    _MutexService_Enter_Handler,
-		},
-		{
-			MethodName: "Exit",
-			Handler:    _MutexService_Exit_Handler,
+			MethodName: "Token",
+			Handler:    _MutexService_Token_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
