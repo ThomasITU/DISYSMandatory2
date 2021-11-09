@@ -22,5 +22,6 @@ func main() {
 }
 
 func startNode(id int, port int, nextPort int, hasToken bool) {
-	go Node.start(id, port, nextPort, hasToken)
+	go Node.start(id, port, nextPort, hasToken)	
+	
 }

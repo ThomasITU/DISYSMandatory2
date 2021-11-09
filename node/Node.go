@@ -29,9 +29,14 @@ type node struct {
 	port         int
 }
 
-func start(id int, port int, nextPort int,hasToken bool) {
+func main() {
 	//get input id, ownport, next port
+
+	var id, port, nextPort int
+	var hasToken bool
+	fmt.Scanln(&id, &port, &nextPort, &hasToken)
 	node := node{id: id, state: hasToken, nextNodePort: nextPort, port: port}
+	fmt.Printf("node id: %v, node port: %v, nextNodePort: %v, state: %t", node.id, node.port, node.nextNodePort, node.state)
 
 	go listen(node.port)
 
@@ -43,24 +48,17 @@ func start(id int, port int, nextPort int,hasToken bool) {
 	}
 
 	fmt.Scanln()
-
-	for {
-
-	}
-
-	// broadcast til de andre noder grpc.dial
-	// grpc.send conn.send
-
 }
 
-func PassToken(ctx context.Context,node *node) {
+func PassToken(ctx context.Context, node *node) {
 	conn, err := grpc.Dial("localhost:"+strconv.Itoa(node.nextNodePort), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to connect to: %s", strconv.Itoa(node.port))
 	}
 	nextNode := mutex.NewMutexServiceClient(conn)
 
-	if _,err  := nextNode.Token(ctx, &mutex.EmptyRequest{}); err != nil {}
+	if _, err := nextNode.Token(ctx, &mutex.EmptyRequest{}); err != nil {
+	}
 }
 
 func (s *server) Token(ctx context.Context, node *node) (*mutex.EmptyResponse, error) {
@@ -81,17 +79,17 @@ func writeToLog(nodeID int, logName string) {
 	defer f.Close()
 
 	log.SetOutput(f)
-	log.Printf("Node nr. %s has entered the critical section at time: %v", nodeID)
+	log.Printf("Node nr. %v has entered the critical section", nodeID)
 }
 
 func listen(port int) {
 	lis, err := net.Listen("tcp", "localhost:"+strconv.Itoa(port))
 	if err != nil {
-		log.Fatalf("Could not listen to %s", port)
+		log.Fatalf("Could not listen to %v", port)
 	}
 
 	grpcServer := grpc.NewServer()
-	mutex.RegisterMutexServiceServer(grpcServer, &erver{})
+	mutex.RegisterMutexServiceServer(grpcServer, mutex.UnimplementedMutexServiceServer{})
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve on ")
 	}
