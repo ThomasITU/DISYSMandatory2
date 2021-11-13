@@ -1,15 +1,15 @@
 # DISYSMandatory2
 
-## protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative mutex/mutex.proto
+### protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative mutex/mutex.proto
 
---
-0 8080 8090 false
-1 8090 8100 false
-2 8100 8110 false
-3 8110 8120 false
-4 8120 8080 true
+# How to run the program
+- To run the program start up more then 1 node by using "go run ."
+- each node takes an input string as "%id %ownport %portofnextnode %isLastnode" 
+- the last node starts with the token  
 
+# below is input for 3 nodes
 
-0 8080 8090 false
-1 8090 8100 false
-2 8100 8080 true
+- 0 8080 8090 false
+- 1 8090 8100 false
+- 2 8100 8080 true
+
