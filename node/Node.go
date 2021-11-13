@@ -7,15 +7,11 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"time"
-
-	//"time"
 
 	"github.com/ThomasITU/DISYSMandatory2/mutex"
 	"google.golang.org/grpc"
 )
 
-// lav en node struct med info og de andre
 const (
 	logFileName = "serverLog"
 )
@@ -33,29 +29,33 @@ type node struct {
 }
 
 func main() {
-	//get input id, ownport, next port
 
 	var id, port, nextPort int
 	var hasToken bool
 	fmt.Scanln(&id, &port, &nextPort, &hasToken)
 	node := node{id: id, state: hasToken, nextNodePort: nextPort, port: port}
-	// fmt.Printf("node id: %v, node port: %v, nextNodePort: %v, state: %t", node.id, node.port, node.nextNodePort, node.state)
 
 	server := Server{this: node}
-	go listen(node.port, &server)
+	go listen(server.this.port, &server)
 
-	if node.state == true {
-		go server.Token(context.Background(), &mutex.EmptyRequest{})
+	if server.this.state {
+		startTokenRing(&server)
 	}
 
-	var input string
 	for {
-		fmt.Printf("nodeID: %v - ", node.id)
-		fmt.Scanln(&input)
-		if len(input) > 1 {
+		// issue with waitForInput here and in token()
+		// currently have to give 2 inputs, figure out how to flush the terminal
+		input := waitForInput(&server.this)
+		if len(input) > 0 {
 			AccessWanted(&server)
+			input = ""
 		}
 	}
+}
+
+func startTokenRing(s *Server) {
+	s.this.state = false
+	go s.Token(context.Background(), &mutex.EmptyRequest{})
 }
 
 func AccessWanted(s *Server) {
@@ -73,8 +73,6 @@ func PassToken(node *node) {
 
 	if _, err := nextNode.Token(ctx, &mutex.EmptyRequest{}); err != nil {
 		log.Println(err)
-	} else {
-		log.Println("No errors")
 	}
 }
 
@@ -83,24 +81,40 @@ func (s *Server) Token(ctx context.Context, empty *mutex.EmptyRequest) (*mutex.E
 		enterMsg := fmt.Sprintf("Node: %v has entered the critical section", s.this.id)
 		writeToLog(enterMsg, logFileName)
 
-		time.Sleep(1 * time.Second)
+		//flush the terminal
+		fmt.Print("")
 		leaveMsg := fmt.Sprintf("Node: %v has left the critical section", s.this.id)
-		writeToLog(leaveMsg, logFileName)
-		s.this.state = false
+		fmt.Println("To leave the section input any string that is not the empty string")
+		for {
+			input := waitForInput(&s.this)
+			if len(input) > 0 {
+				writeToLog(leaveMsg, logFileName)
+				s.this.state = false
+				break
+			}
+		}
+
 	}
 
 	PassToken(&s.this)
 	return &mutex.EmptyResponse{}, nil
 }
 
+func waitForInput(n *node) string {
+	var input string
+	fmt.Printf("nodeID: %v - ", n.id)
+	fmt.Scanln(&input)
+	return input
+}
+
 func writeToLog(msg string, logName string) {
-	f, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile(logName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
-	defer f.Close()
+	defer file.Close()
 
-	log.SetOutput(f)
+	log.SetOutput(file)
 	log.Printf(msg)
 }
 
