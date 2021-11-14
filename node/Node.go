@@ -43,12 +43,11 @@ func main() {
 	}
 
 	for {
-		// issue with waitForInput here and in token()
-		// currently have to give 2 inputs, figure out how to flush the terminal
 		input := waitForInput(&server.this)
 		if len(input) > 0 {
 			AccessWanted(&server)
-			input = ""
+			for server.this.state {
+			}
 		}
 	}
 }
@@ -60,6 +59,7 @@ func startTokenRing(s *Server) {
 
 func AccessWanted(s *Server) {
 	s.this.state = true
+	fmt.Println("Waiting to gain access")
 }
 
 func PassToken(node *node) {
@@ -81,8 +81,6 @@ func (s *Server) Token(ctx context.Context, empty *mutex.EmptyRequest) (*mutex.E
 		enterMsg := fmt.Sprintf("Node: %v has entered the critical section", s.this.id)
 		writeToLog(enterMsg, logFileName)
 
-		//flush the terminal
-		fmt.Print("")
 		leaveMsg := fmt.Sprintf("Node: %v has left the critical section", s.this.id)
 		fmt.Println("To leave the section input any string that is not the empty string")
 		for {
